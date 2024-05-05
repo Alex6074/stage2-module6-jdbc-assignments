@@ -30,6 +30,11 @@ public class CustomDataSource implements DataSource {
         this.url = url;
         this.name = name;
         this.password = password;
+        try {
+            Class.forName(driver);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Failed to load JDBC driver", e);
+        }
     }
 
     public static CustomDataSource getInstance() {
