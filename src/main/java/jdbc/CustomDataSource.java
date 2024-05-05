@@ -27,11 +27,6 @@ public class CustomDataSource implements DataSource {
         this.url = url;
         this.name = name;
         this.password = password;
-        /*try {
-            Class.forName(driver);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Failed to load JDBC driver", e);
-        }*/
     }
 
     public static CustomDataSource getInstance() {
@@ -48,7 +43,8 @@ public class CustomDataSource implements DataSource {
                         String name = properties.getProperty("postgres.name");
                         String password = properties.getProperty("postgres.password");
                         instance = new CustomDataSource(driver, url, password, name);
-                    } catch (IOException e) {
+                        Class.forName(driver);
+                    } catch (IOException | ClassNotFoundException e) {
                         throw new RuntimeException(e);
                     }
                 }
@@ -59,12 +55,12 @@ public class CustomDataSource implements DataSource {
 
     @Override
     public Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(url);
+        return new CustomConnector().getConnection(url);
     }
 
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
-        return DriverManager.getConnection(url, username, password);
+        return new CustomConnector().getConnection(url, username, password);
     }
 
     @Override
