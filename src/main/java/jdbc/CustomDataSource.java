@@ -5,9 +5,9 @@ import javax.sql.DataSource;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.Properties;
@@ -30,14 +30,12 @@ public class CustomDataSource implements DataSource {
     }
 
     public static CustomDataSource getInstance() {
-        CustomDataSource localInstance = instance;
-        if (localInstance == null) {
+        if (instance==null) {
             synchronized (CustomDataSource.class) {
-                localInstance = instance;
-                if (localInstance == null) {
+                if (instance==null) {
                     Properties properties = new Properties();
-                    try(InputStream input = CustomDataSource.class.getClassLoader().getResourceAsStream("app.properties")) {
-                        properties.load(input);
+                    try {
+                        properties.load(CustomDataSource.class.getClassLoader().getResourceAsStream("app.properties"));
                         String driver = properties.getProperty("postgres.driver");
                         String url = properties.getProperty("postgres.url");
                         String name = properties.getProperty("postgres.name");
@@ -45,17 +43,17 @@ public class CustomDataSource implements DataSource {
                         instance = new CustomDataSource(driver, url, password, name);
                         Class.forName(driver);
                     } catch (IOException | ClassNotFoundException e) {
-                        throw new RuntimeException(e);
+                        e.printStackTrace();
                     }
                 }
             }
         }
-        return localInstance;
+        return instance;
     }
 
     @Override
     public Connection getConnection() throws SQLException {
-        return new CustomConnector().getConnection(url);
+        return new CustomConnector().getConnection(url, name, password);
     }
 
     @Override
@@ -63,37 +61,37 @@ public class CustomDataSource implements DataSource {
         return new CustomConnector().getConnection(url, username, password);
     }
 
-    @Override
     public PrintWriter getLogWriter() throws SQLException {
-        return DriverManager.getLogWriter();
+        throw new UnsupportedOperationException("'getLogWriter' is not implemented");
     }
 
     @Override
     public void setLogWriter(PrintWriter out) throws SQLException {
+        throw new UnsupportedOperationException("'setLogWriter' is not implemented");
     }
 
     @Override
     public void setLoginTimeout(int seconds) throws SQLException {
-
+        throw new UnsupportedOperationException("'setLoginTimeout' is not implemented");
     }
 
     @Override
     public int getLoginTimeout() throws SQLException {
-        return 0;
+        throw new UnsupportedOperationException("'getLoginTimeout' is not implemented");
     }
 
     @Override
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-        return null;
+        throw new UnsupportedOperationException("'getParentLogger' is not implemented");
     }
 
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
-        return null;
+        throw new UnsupportedOperationException("'unwrap' is not implemented");
     }
 
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        return false;
+        throw new UnsupportedOperationException("'isWrapperFor' is not implemented");
     }
 }
