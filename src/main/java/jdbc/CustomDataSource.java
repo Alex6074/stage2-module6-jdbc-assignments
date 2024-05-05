@@ -5,10 +5,7 @@ import javax.sql.DataSource;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -44,8 +41,8 @@ public class CustomDataSource implements DataSource {
                 localInstance = instance;
                 if (localInstance == null) {
                     Properties properties = new Properties();
-                    try {
-                        properties.load(new FileInputStream("app.properties"));
+                    try(InputStream input = CustomDataSource.class.getClassLoader().getResourceAsStream("app.properties")) {
+                        properties.load(input);
                         String driver = properties.getProperty("postgres.driver");
                         String url = properties.getProperty("postgres.url");
                         String name = properties.getProperty("postgres.name");
