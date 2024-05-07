@@ -20,7 +20,7 @@ public class SimpleJDBCRepository {
     private PreparedStatement ps = null;
     private Statement st = null;
 
-    private static final String createUserSQL = "INSERT INTO myusers (firstname, lastname, age) VALUES (?, ?, ?)";
+    private static final String createUserSQL = "INSERT INTO myusers (id, firstname, lastname, age) VALUES (?, ?, ?, ?)";
     private static final String updateUserSQL = "UPDATE myusers SET firstname = ?, lastname = ?, age = ? WHERE id = ?";
     private static final String deleteUser = "DELETE FROM myusers WHERE id = ?";
     private static final String findUserByIdSQL = "SELECT * FROM myusers WHERE id = ?";
@@ -32,9 +32,10 @@ public class SimpleJDBCRepository {
         try {
             connection = CustomDataSource.getInstance().getConnection();
             ps = connection.prepareStatement(createUserSQL, Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, user.getFirstName());
-            ps.setString(2, user.getLastName());
-            ps.setInt(3, user.getAge());
+            ps.setLong(1, user.getId());
+            ps.setString(2, user.getFirstName());
+            ps.setString(3, user.getLastName());
+            ps.setInt(4, user.getAge());
             ps.execute();
             ResultSet resultSet = ps.getGeneratedKeys();
             if (resultSet.next()) {
@@ -143,5 +144,38 @@ public class SimpleJDBCRepository {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static void main(String[] args) {
+        SimpleJDBCRepository repository = new SimpleJDBCRepository();
+
+        //User user = new User(4L, "dfkl", "Consdfdsnor", 23);
+        //System.out.println("createUser() method output: " + repository.createUser(user));
+
+        User user1 = repository.findUserById(8L);
+        System.out.println("findUserById() method output: " + user1);
+
+        User user3 = repository.findUserByName("Sarah");
+        System.out.println("findUserByName() method output: " + user3);
+
+//        List<User> userList = repository.findAllUser();
+//        System.out.println("findAllUser() method output: ");
+//        if (userList!=null) {
+//            for (User user: userList) {
+//                System.out.println(user.getId() + " " + user.getFirstName() + " " + user.getLastName() + " " + user.getAge());
+//            }
+//        }
+
+//        User user = new User(11L, "Josh", "Turner", 45);
+//        System.out.println("updateUser() method output:");
+//        if (repository.updateUser(user)!=null) {
+//            System.out.println("User: " + user.getId() + " " + user.getFirstName() + " " + user.getLastName() + " " + user.getAge());
+//            System.out.println("has been updated!");
+//        } else {
+//            System.out.println("User update failed!");
+//        }
+
+        //System.out.println("deleteUser() method execution");
+        //repository.deleteUser(6L);
     }
 }
